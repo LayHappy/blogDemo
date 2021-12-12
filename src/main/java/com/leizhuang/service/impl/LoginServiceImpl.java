@@ -75,6 +75,12 @@ public class LoginServiceImpl implements LoginService {
         return sysUser;
     }
 
+    @Override
+    public Result logout(String token) {
+        redisTemplate.delete("TOKEN:"+token);
+        return Result.success(null);
+    }
+
    /* public static void main(String[] args) {
         String asdfa=DigestUtils.md5DigestAsHex(("admin"+slat).getBytes(StandardCharsets.UTF_8));
         System.out.println(asdfa);

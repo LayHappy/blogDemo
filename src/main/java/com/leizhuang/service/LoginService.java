@@ -8,4 +8,6 @@ public interface LoginService {
     Result login(LoginParam loginParam);
 
     SysUser checkToken(String token);
+
+    Result logout(String token);
 }
