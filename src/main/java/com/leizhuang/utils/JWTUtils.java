@@ -38,12 +38,12 @@ public class JWTUtils {
         return null;
     }
 
-/*    public static void main(String[] args) {
+    public static void main(String[] args) {
         String token=JWTUtils.createToken(100L);
         System.out.println(token);
 
         Map<String, Object> map = JWTUtils.checkToken(token);
         System.out.println(map.get("userId"));
 
-    }*/
+    }
 }

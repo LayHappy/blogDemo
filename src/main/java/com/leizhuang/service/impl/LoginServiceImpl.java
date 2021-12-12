@@ -47,8 +47,8 @@ public class LoginServiceImpl implements LoginService {
 
         String account = loginParam.getAccount();
         String password = loginParam.getPassword();
-        String nickname=loginParam.getNickname();
-        if (StringUtils.isBlank(account) || StringUtils.isBlank(password) || StringUtils.isBlank(nickname)) {
+
+        if (StringUtils.isBlank(account) || StringUtils.isBlank(password)  ) {
             return Result.fail(ErrorCode.PARAMS_ERROR.getCode(), ErrorCode.PARAMS_ERROR.getMsg());
         }
         password= DigestUtils.md5DigestAsHex((password+slat).getBytes(StandardCharsets.UTF_8));
@@ -125,8 +125,8 @@ public class LoginServiceImpl implements LoginService {
         return Result.success(token);
     }
 
-   /* public static void main(String[] args) {
+    public static void main(String[] args) {
         String asdfa=DigestUtils.md5DigestAsHex(("admin"+slat).getBytes(StandardCharsets.UTF_8));
         System.out.println(asdfa);
-    }*/
+    }
 }
