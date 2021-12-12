@@ -10,6 +10,7 @@ import com.leizhuang.vo.LoginUserVo;
 import com.leizhuang.vo.Result;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class SysUserServiceImpl implements SysUserService {
     /*@Autowired
     private RedisTemplate<String,String> redisTemplate;*/
     @Autowired
+    @Lazy
     private LoginService loginService;
     @Override
     public SysUser findUserById(Long id) {

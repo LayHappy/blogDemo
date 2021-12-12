@@ -10,6 +10,7 @@ import com.leizhuang.vo.Result;
 import com.leizhuang.vo.params.LoginParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class LoginServiceImpl implements LoginService {
     @Autowired
+    @Lazy
     private SysUserService sysUserService;
     @Autowired
     private RedisTemplate<String, String> redisTemplate;

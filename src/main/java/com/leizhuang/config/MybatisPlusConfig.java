@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration;
  * @author LeiZhuang
  * @date 2021/12/11 15:40
  */
-@Configuration//标记一个配置类，让spring可以扫描到
+@Configuration
 @MapperScan("com.leizhuang.dao.mapper")
 public class MybatisPlusConfig {
-//    分页插件
+    //分页插件
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor(){
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
