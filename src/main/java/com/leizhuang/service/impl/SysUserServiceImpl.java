@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author LeiZhuang
@@ -27,22 +28,38 @@ public class SysUserServiceImpl implements SysUserService {
     @Autowired
     @Lazy
     private LoginService loginService;
+
     @Override
     public SysUser findUserById(Long id) {
         SysUser sysUser = sysUserMapper.selectById(id);
         if (sysUser == null) {
-            sysUser=new SysUser();
+            sysUser = new SysUser();
             sysUser.setNickname("leizhuang:BlogUser");
         }
         return sysUser;
     }
 
     @Override
+    public SysUser findUserByAccount(String account) {
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getAccount, account);
+        queryWrapper.last("limit 1");
+        this.sysUserMapper.selectOne(queryWrapper);
+        return null;
+    }
+
+    @Override
+    public void save(SysUser sysUser) {
+//        这里用户id会自动生成，这个地方默认生成的id是分布式id，采用雪花算法
+        this.sysUserMapper.insert(sysUser);
+    }
+
+    @Override
     public SysUser findUser(String account, String password) {
-        LambdaQueryWrapper<SysUser> queryWrapper=new LambdaQueryWrapper<>();
-        queryWrapper.eq(SysUser::getAccount,account);
-        queryWrapper.eq(SysUser::getPassword,password);
-        queryWrapper.select(SysUser::getAccount,SysUser::getAvatar,SysUser::getNickname);
+        LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SysUser::getAccount, account);
+        queryWrapper.eq(SysUser::getPassword, password);
+        queryWrapper.select(SysUser::getAccount, SysUser::getAvatar, SysUser::getNickname);
         queryWrapper.last("limit 1");
         return sysUserMapper.selectOne(queryWrapper);
     }
@@ -56,7 +73,7 @@ public class SysUserServiceImpl implements SysUserService {
          * 3.如果成功，返回对应的结果 LoginUserVo
          */
 
-     SysUser sysUser=loginService.checkToken(token);
+        SysUser sysUser = loginService.checkToken(token);
         if (sysUser == null) {
             Result.fail(ErrorCode.TOKEN_ERROR.getCode(), ErrorCode.TOKEN_ERROR.getMsg());
         }
