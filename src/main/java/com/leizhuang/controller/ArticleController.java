@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("articles")
 public class ArticleController {
     @Autowired
-    private ArticleService articleService;
+    private ArticleService articleService;//
+
     /**
      * 首页文章列表
      *
@@ -28,5 +29,20 @@ public class ArticleController {
         return articleService.listArticle(pageParams);
     }
 
+    @PostMapping("hot")
+    public Result hotArticle() {
+        int limit = 5;
+        return articleService.hotArticle(limit);
+    }
+    @PostMapping("new")
+    public Result newArticle() {
+        int limit = 5;
+        return articleService.newArticle(limit);
+    }
+    @PostMapping("listArchives")
+    public Result listArchives() {
+
+        return articleService.listArchives();
+    }
 
 }

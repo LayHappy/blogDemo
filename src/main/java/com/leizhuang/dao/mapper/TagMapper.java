@@ -2,6 +2,7 @@ package com.leizhuang.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.leizhuang.dao.pojo.Tag;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -9,7 +10,7 @@ import java.util.List;
  * @author LeiZhuang
  * @date 2021/12/11 16:10
  */
-
+@Repository
 public interface TagMapper extends BaseMapper<Tag> {
     /**
      * 根据文章id查询标签列表

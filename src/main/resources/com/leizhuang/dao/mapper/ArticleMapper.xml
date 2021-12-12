@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.leizhuang.dao.mapper.ArticleMapper">
+<!--    List<Archives> listArchives();-->
+
+    <!--select
+    year(create_date) as year,
+    month(create_date)as month,
+    count(*) as count
+    from ms_article
+    group by year,month--><!--此条sql会导致查询出来的数据为null年null月，因为数据库字段类型为bigint 13位，直接year不行，需要先date转型然后year-->
+    <select id="listArchives" resultType="com.leizhuang.dao.dos.Archives">
+        select year(FROM_UNIXTIME(create_date / 1000))  year,
+               month(FROM_UNIXTIME(create_date / 1000)) month,
+               count(*)                                 count
+        from ms_article
+        group by year, month
+    </select>
+</mapper>
