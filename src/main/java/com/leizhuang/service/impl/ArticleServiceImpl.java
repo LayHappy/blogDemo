@@ -7,10 +7,7 @@ import com.leizhuang.dao.mapper.ArticleBodyMapper;
 import com.leizhuang.dao.mapper.ArticleMapper;
 import com.leizhuang.dao.pojo.Article;
 import com.leizhuang.dao.pojo.ArticleBody;
-import com.leizhuang.service.ArticleService;
-import com.leizhuang.service.CategoryService;
-import com.leizhuang.service.SysUserService;
-import com.leizhuang.service.TagService;
+import com.leizhuang.service.*;
 import com.leizhuang.vo.ArticleBodyVo;
 import com.leizhuang.vo.ArticleVo;
 import com.leizhuang.vo.Result;
@@ -102,6 +99,8 @@ public class ArticleServiceImpl implements ArticleService {
 
         return articleVoList;
     }*/
+    @Autowired
+    private ThreadService threadService;
     @Override
     public Result findArticleById(Long articleId) {
         /**
@@ -111,7 +110,15 @@ public class ArticleServiceImpl implements ArticleService {
 
         Article article=this.articleMapper.selectById(articleId);
 
-                ArticleVo articleVo=copy(article,true,true,true,true);
+        ArticleVo articleVo=copy(article,true,true,true,true);
+
+//        查看完文章之后应新增阅读数
+        //        Q:查看完文章之后，本应该直接返回数据了，这时候做了一个更新操作，更新时加写锁，就会阻塞其他的读操作，性能较低
+//        更新 增加了此次接口的耗时，如果更新出问题，不能影响查看文章的操作
+
+//        线程池，可以把更新操作放到线程池中执行，和主线程就不想相关了
+
+        threadService.updateArticleViewCount(articleMapper,article);
                 return Result.success(articleVo);
     }
 
@@ -121,6 +128,7 @@ public class ArticleServiceImpl implements ArticleService {
         BeanUtils.copyProperties(article, articleVo);
         articleVo.setCreateDate(new DateTime(article.getCreateDate()).toString("yyyy-MM-dd HH:mm"));
 //        判断是否需要标签和作者
+
         if (isTag) {
             Long articleId = article.getId();
             articleVo.setTags(tagService.findTagsByArticleId(articleId));
