@@ -8,7 +8,9 @@ import com.leizhuang.service.SysUserService;
 import com.leizhuang.vo.ErrorCode;
 import com.leizhuang.vo.LoginUserVo;
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.UserVo;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -37,6 +39,22 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser.setNickname("leizhuang:BlogUser");
         }
         return sysUser;
+    }
+    @Override
+    public UserVo findUserVoById(Long id) {
+        SysUser sysUser = sysUserMapper.selectById(id);
+        if (sysUser == null) {
+            sysUser = new SysUser();
+            sysUser.setId(1L);
+            sysUser.setAvatar("/static/img/log.a4hriuh.png");
+            sysUser.setNickname("leizhuang:BlogUser");
+        }
+        UserVo userVo = new UserVo();
+        BeanUtils.copyProperties(sysUser,userVo);
+      /*  userVo.setId(sysUser.getId());
+        userVo.setNickname(sysUser.getNickname());
+        userVo.setAvatar(sysUser.getAvatar());*/
+        return userVo;
     }
 
     @Override

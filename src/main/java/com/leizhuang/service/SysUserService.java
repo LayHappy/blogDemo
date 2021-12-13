@@ -2,6 +2,7 @@ package com.leizhuang.service;
 
 import com.leizhuang.dao.pojo.SysUser;
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.UserVo;
 
 public interface SysUserService {
     SysUser findUserById(Long id);
@@ -19,4 +20,6 @@ public interface SysUserService {
     SysUser findUserByAccount(String account);
 
     void save(SysUser sysUser);
+
+    UserVo findUserVoById(Long id);
 }
