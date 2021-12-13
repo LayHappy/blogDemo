@@ -93,7 +93,15 @@ public class ArticleServiceImpl implements ArticleService {
 
         return articleVoList;
     }
+/*//    重载
+    private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor,boolean isBody,boolean isCategory) {
+        List<ArticleVo> articleVoList = new ArrayList<>();
+        for (Article record : records) {
+            articleVoList.add(copy(record, isTag, isAuthor,isBody,isCategory));
+        }
 
+        return articleVoList;
+    }*/
     @Override
     public Result findArticleById(Long articleId) {
         /**
