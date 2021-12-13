@@ -43,17 +43,15 @@ public class SysUserServiceImpl implements SysUserService {
     @Override
     public UserVo findUserVoById(Long id) {
         SysUser sysUser = sysUserMapper.selectById(id);
+
         if (sysUser == null) {
             sysUser = new SysUser();
             sysUser.setId(1L);
-            sysUser.setAvatar("/static/img/log.a4hriuh.png");
-            sysUser.setNickname("leizhuang:BlogUser");
+            sysUser.setAvatar("/static/img/logo.b3a48c0.png");
+            sysUser.setNickname("牛逼666");
         }
         UserVo userVo = new UserVo();
-        BeanUtils.copyProperties(sysUser,userVo);
-      /*  userVo.setId(sysUser.getId());
-        userVo.setNickname(sysUser.getNickname());
-        userVo.setAvatar(sysUser.getAvatar());*/
+        BeanUtils.copyProperties(sysUser, userVo);
         return userVo;
     }
 

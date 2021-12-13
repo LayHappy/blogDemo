@@ -2,6 +2,7 @@ package com.leizhuang.controller;
 
 import com.leizhuang.service.CommentsService;
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.params.CommentParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,5 +19,9 @@ public class CommentController {
     @GetMapping("article/{id}")
     public Result comments(@PathVariable("id") Long id) {
         return commentsService.commentsByArticleId(id);
+    }
+    @PostMapping("create/change")
+    public Result comment(@RequestBody CommentParam commentParam){
+        return commentsService.comment(commentParam);
     }
 }

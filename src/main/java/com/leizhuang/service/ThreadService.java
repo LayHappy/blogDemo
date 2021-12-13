@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.leizhuang.dao.mapper.ArticleMapper;
 import com.leizhuang.dao.pojo.Article;
+import com.leizhuang.dao.pojo.SysUser;
+import com.leizhuang.utils.UserThreadLocal;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
@@ -34,5 +36,7 @@ public class ThreadService {
         }catch (Exception e){
 
         }*/
+        SysUser sysUser = UserThreadLocal.get();
+        System.out.println(sysUser.getId());
     }
 }

@@ -1,6 +1,7 @@
 package com.leizhuang.service;
 
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.params.CommentParam;
 
 /**
  * @author LeiZhuang
@@ -13,4 +14,6 @@ public interface CommentsService {
      * @return
      */
     Result commentsByArticleId(Long id);
+
+    Result comment(CommentParam commentParam);
 }
