@@ -34,15 +34,21 @@ public class ArticleController {
         int limit = 5;
         return articleService.hotArticle(limit);
     }
+
     @PostMapping("new")
     public Result newArticle() {
         int limit = 5;
         return articleService.newArticle(limit);
     }
+
     @PostMapping("listArchives")
     public Result listArchives() {
 
         return articleService.listArchives();
     }
 
+    @PostMapping("/view/{id}")
+    public Result findArticleById(@PathVariable("id") Long articleId) {
+return articleService.findArticleById(articleId);
+    }
 }

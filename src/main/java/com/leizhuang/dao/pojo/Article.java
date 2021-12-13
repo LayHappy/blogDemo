@@ -1,5 +1,7 @@
 package com.leizhuang.dao.pojo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Article {
     public static final int Article_TOP=0;//是否置顶
     public static final int Article_common=0;//
+//    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;//文章id
     private String title;//文章标题
     private String summary;//文章摘要
