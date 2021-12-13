@@ -3,6 +3,7 @@ package com.leizhuang.handler;
 import com.alibaba.fastjson.JSON;
 import com.leizhuang.dao.pojo.SysUser;
 import com.leizhuang.service.LoginService;
+import com.leizhuang.utils.UserThreadLocal;
 import com.leizhuang.vo.ErrorCode;
 import com.leizhuang.vo.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -60,8 +61,15 @@ public class LoginInterceptor implements HandlerInterceptor {
             response.getWriter().print(JSON.toJSONString(result));
             return false;
         }
+        UserThreadLocal.put(user);
 //        验证成功，放行
         return true;
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+//        如果不删除ThreadLocal中用完的信息，会有内存泄漏的风险
+        UserThreadLocal.remove();
     }
 }
 
