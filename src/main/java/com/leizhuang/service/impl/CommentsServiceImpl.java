@@ -71,7 +71,7 @@ public class CommentsServiceImpl implements CommentsService {
         if (1 == level) {
             Long id = comment.getId();
             List<CommentVo> commentVoList = findCommentsByParentId(id);
-            commentVo.setChildren(commentVoList);
+            commentVo.setChildrens(commentVoList);
         }
 //        to User 给谁评论
         if (level > 1) {
@@ -97,7 +97,7 @@ public class CommentsServiceImpl implements CommentsService {
         Comment comment = new Comment();
 
         comment.setArticleId(commentParam.getArticleId());
-        System.out.println(sysUser.getId());
+//        System.out.println(sysUser.getId());
         comment.setAuthorId(sysUser.getId());
 
         comment.setContent(commentParam.getContent());

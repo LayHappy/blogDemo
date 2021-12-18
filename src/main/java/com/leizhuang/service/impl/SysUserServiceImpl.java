@@ -48,7 +48,7 @@ public class SysUserServiceImpl implements SysUserService {
             sysUser = new SysUser();
             sysUser.setId(1L);
             sysUser.setAvatar("/static/img/logo.b3a48c0.png");
-            sysUser.setNickname("牛逼666");
+            sysUser.setNickname("默认Nickname");
         }
         UserVo userVo = new UserVo();
         BeanUtils.copyProperties(sysUser, userVo);

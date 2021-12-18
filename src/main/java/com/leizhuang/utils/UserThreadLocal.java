@@ -13,14 +13,14 @@ public class UserThreadLocal {
     private static final ThreadLocal<SysUser> LOCAL = new ThreadLocal<>();
 
     public static void put(SysUser sysUser) {
-        System.out.println(Thread.currentThread().getName()+"set方法");
+//        System.out.println(Thread.currentThread().getName()+"set方法");
         LOCAL.set(sysUser);
-        SysUser user = UserThreadLocal.get();
-        System.out.println("get到的id值"+user.getId());
+      /*  SysUser user = UserThreadLocal.get();
+        System.out.println("get到的id值"+user.getId());*/
     }
 
     public static SysUser get() {
-        System.out.println(Thread.currentThread().getName()+"get方法");
+//        System.out.println(Thread.currentThread().getName()+"get方法");
         return LOCAL.get();
     }
 
