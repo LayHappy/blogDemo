@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestInterceptorsController {
     @RequestMapping
     public Result test(){
-        SysUser sysUser= UserThreadLocal.get();
+//        SysUser sysUser= UserThreadLocal.get();
 //        System.out.println(sysUser);
         return Result.success(null);
     }

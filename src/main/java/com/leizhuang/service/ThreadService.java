@@ -36,7 +36,7 @@ public class ThreadService {
         }catch (Exception e){
 
         }*/
-        SysUser sysUser = UserThreadLocal.get();
-        System.out.println(sysUser.getId());
+       /* SysUser sysUser = UserThreadLocal.get();
+        System.out.println(sysUser.getId());*/
     }
 }

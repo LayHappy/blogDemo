@@ -60,8 +60,10 @@ public class SysUserServiceImpl implements SysUserService {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysUser::getAccount, account);
         queryWrapper.last("limit 1");
-        this.sysUserMapper.selectOne(queryWrapper);
-        return null;
+      /*  this.sysUserMapper.selectOne(queryWrapper);
+        return null;*/
+
+        return  this.sysUserMapper.selectOne(queryWrapper);
     }
 
     @Override
@@ -75,7 +77,19 @@ public class SysUserServiceImpl implements SysUserService {
         LambdaQueryWrapper<SysUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(SysUser::getAccount, account);
         queryWrapper.eq(SysUser::getPassword, password);
-        queryWrapper.select(SysUser::getAccount, SysUser::getAvatar, SysUser::getNickname);
+        queryWrapper.select(SysUser::getAccount, SysUser::getId, SysUser::getNickname);
+
+/**
+ * ==>  Preparing: SELECT account,id,nickname FROM ms_sys_user WHERE (account = ? AND password = ?) limit 1
+ * ==> Parameters: admin(String), 0360ab97db54d09e12fd9bf7a163fb8f(String)
+ * <==    Columns: account, id, nickname
+ * <==        Row: admin, 1, 李四
+ * <==      Total: 1
+ * 这个注释是要注意：给用户评论是需要判断是否登陆的，判断用户登陆就需要对比数据库的信息，
+ * 因为findUser()方法查错了信息，导致，JWTUtils创建了一个错误的token，redis也存了一个错误的TOKEN
+ * 导致最终ThreadLocal存错信息，get出来的id为null
+ */
+//        queryWrapper.select(SysUser::getAccount, SysUser::getAvatar, SysUser::getNickname);
         queryWrapper.last("limit 1");
         return sysUserMapper.selectOne(queryWrapper);
     }
