@@ -1,5 +1,6 @@
 package com.leizhuang.controller;
 
+import com.leizhuang.aop.LogAnnotation;
 import com.leizhuang.service.ArticleService;
 
 import com.leizhuang.vo.Result;
@@ -25,6 +26,7 @@ public class ArticleController {
      * @return
      */
     @PostMapping
+    @LogAnnotation(module = "文章",operator = "获取文章列表")
     public Result listArticle(@RequestBody PageParams pageParams) {
 
         return articleService.listArticle(pageParams);
