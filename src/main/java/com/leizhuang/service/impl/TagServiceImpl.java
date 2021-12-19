@@ -1,5 +1,6 @@
 package com.leizhuang.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.leizhuang.dao.mapper.TagMapper;
 import com.leizhuang.dao.pojo.Tag;
 import com.leizhuang.service.TagService;
@@ -57,6 +58,12 @@ public List<TagVo> copyList(List<Tag> tagList){
 //      select * from tag where id in(1,2,3,4)
         List<Tag> tagList=tagMapper.findTagsByTagIds(tagIds);
         return Result.success(tagList);
+    }
+
+    @Override
+    public Result findAll() {
+        List<Tag> tagList = this.tagMapper.selectList(new LambdaQueryWrapper<>());
+        return Result.success(copyList(tagList));
     }
 }
 

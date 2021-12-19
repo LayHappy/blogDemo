@@ -1,6 +1,7 @@
 package com.leizhuang.service;
 
 import com.leizhuang.vo.CategoryVo;
+import com.leizhuang.vo.Result;
 
 /**
  * @author LeiZhuang
@@ -12,4 +13,7 @@ public interface CategoryService {
    查询类别
      */
     CategoryVo findCategoryById(Long categoryId);
+
+    Result findAll();
+
 }

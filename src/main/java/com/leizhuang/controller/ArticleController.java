@@ -3,6 +3,7 @@ package com.leizhuang.controller;
 import com.leizhuang.service.ArticleService;
 
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.params.ArticleParam;
 import com.leizhuang.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +50,11 @@ public class ArticleController {
 
     @PostMapping("/view/{id}")
     public Result findArticleById(@PathVariable("id") Long articleId) {
-return articleService.findArticleById(articleId);
+        return articleService.findArticleById(articleId);
+    }
+
+    @PostMapping("publish")
+    public Result publish(@RequestBody ArticleParam articleParam) {
+        return articleService.publish(articleParam);
     }
 }

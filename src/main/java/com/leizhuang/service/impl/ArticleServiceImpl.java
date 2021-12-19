@@ -5,12 +5,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leizhuang.dao.dos.Archives;
 import com.leizhuang.dao.mapper.ArticleBodyMapper;
 import com.leizhuang.dao.mapper.ArticleMapper;
+import com.leizhuang.dao.mapper.ArticleTagMapper;
 import com.leizhuang.dao.pojo.Article;
 import com.leizhuang.dao.pojo.ArticleBody;
+import com.leizhuang.dao.pojo.ArticleTag;
+import com.leizhuang.dao.pojo.SysUser;
 import com.leizhuang.service.*;
+import com.leizhuang.utils.UserThreadLocal;
 import com.leizhuang.vo.ArticleBodyVo;
 import com.leizhuang.vo.ArticleVo;
 import com.leizhuang.vo.Result;
+import com.leizhuang.vo.TagVo;
+import com.leizhuang.vo.params.ArticleParam;
 import com.leizhuang.vo.params.PageParams;
 import org.joda.time.DateTime;
 import org.springframework.beans.BeanUtils;
@@ -19,7 +25,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author LeiZhuang
@@ -37,31 +45,33 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private SysUserService sysUserService;
 
+    @Autowired
+    private ArticleTagMapper articleTagMapper;
     @Override
     public Result hotArticle(int limit) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Article::getViewCounts);
         queryWrapper.select(Article::getId, Article::getTitle);
         queryWrapper.last("limit " + limit);
-    //select id,titile from article order by view_count desc limit 5
+        //select id,titile from article order by view_count desc limit 5
         List<Article> articles = articleMapper.selectList(queryWrapper);
         return Result.success(copyList(articles, false, false));
     }
 
     @Override
     public Result newArticle(int limit) {
-        LambdaQueryWrapper<Article> queryWrapper=new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.orderByDesc(Article::getCreateDate);
-        queryWrapper.select(Article::getId,Article::getTitle);
-        queryWrapper.last("limit "+limit);
+        queryWrapper.select(Article::getId, Article::getTitle);
+        queryWrapper.last("limit " + limit);
         List<Article> articles = articleMapper.selectList(queryWrapper);
 
-        return Result.success(copyList(articles,false,false));
+        return Result.success(copyList(articles, false, false));
     }
 
     @Override
     public Result listArchives() {
-       List<Archives> archivesList= articleMapper.listArchives();
+        List<Archives> archivesList = articleMapper.listArchives();
         return Result.success(archivesList);
     }
 
@@ -90,17 +100,19 @@ public class ArticleServiceImpl implements ArticleService {
 
         return articleVoList;
     }
-/*//    重载
-    private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor,boolean isBody,boolean isCategory) {
-        List<ArticleVo> articleVoList = new ArrayList<>();
-        for (Article record : records) {
-            articleVoList.add(copy(record, isTag, isAuthor,isBody,isCategory));
-        }
 
-        return articleVoList;
-    }*/
+    /*//    重载
+        private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor,boolean isBody,boolean isCategory) {
+            List<ArticleVo> articleVoList = new ArrayList<>();
+            for (Article record : records) {
+                articleVoList.add(copy(record, isTag, isAuthor,isBody,isCategory));
+            }
+
+            return articleVoList;
+        }*/
     @Autowired
     private ThreadService threadService;
+
     @Override
     public Result findArticleById(Long articleId) {
         /**
@@ -108,9 +120,9 @@ public class ArticleServiceImpl implements ArticleService {
          * 2.根据bodyId和categoryId去做关联查询
          */
 
-        Article article=this.articleMapper.selectById(articleId);
+        Article article = this.articleMapper.selectById(articleId);
 
-        ArticleVo articleVo=copy(article,true,true,true,true);
+        ArticleVo articleVo = copy(article, true, true, true, true);
 
 //        查看完文章之后应新增阅读数
         //        Q:查看完文章之后，本应该直接返回数据了，这时候做了一个更新操作，更新时加写锁，就会阻塞其他的读操作，性能较低
@@ -118,8 +130,61 @@ public class ArticleServiceImpl implements ArticleService {
 
 //        线程池，可以把更新操作放到线程池中执行，和主线程就不想相关了
 
-        threadService.updateArticleViewCount(articleMapper,article);
-                return Result.success(articleVo);
+        threadService.updateArticleViewCount(articleMapper, article);
+        return Result.success(articleVo);
+    }
+
+    //文章发布服务
+    @Override
+    public Result publish(ArticleParam articleParam) {
+
+        SysUser sysUser = UserThreadLocal.get();
+        /**
+         * 1.发布文章 目的：构建Article对象
+         * 2.作者id，当前的登陆用户
+         * 3.标签  要将标签加入到关联列表当中
+         * 4.body内容存储，article bodyId
+         */
+        Article article = new Article();
+        article.setAuthorId(sysUser.getId());
+        article.setWeight(Article.Article_common);
+        article.setViewCounts(0);
+        article.setTitle(articleParam.getTitle());
+        article.setSummary(articleParam.getSummary());
+        article.setCommentCounts(0);
+        article.setCreateDate(System.currentTimeMillis());
+        article.setCategoryId(articleParam.getCategory().getId());
+//        insert之后会生成一个文章id
+        this.articleMapper.insert(article);
+//        tag
+        List<TagVo> tags = articleParam.getTags();
+        if (tags != null) {
+            for (TagVo tag : tags) {
+                Long articleId = article.getId();
+                ArticleTag articleTag = new ArticleTag();
+
+                articleTag.setTagId(tag.getId());
+
+                articleTag.setArticleId(articleId);
+                articleTagMapper.insert(articleTag);
+
+            }
+
+        }
+        //body
+        ArticleBody articleBody = new ArticleBody();
+        articleBody.setArticleId(article.getId());
+        articleBody.setContent(articleParam.getBody().getContent());
+        articleBody.setContentHtml(articleParam.getBody().getContentHtml());
+        articleBodyMapper.insert(articleBody);
+        article.setBodyId(articleBody.getId());
+
+        articleMapper.updateById(article);
+
+        Map<String,String> map=new HashMap<>();
+        map.put("id",article.getId().toString());
+
+        return Result.success(map);
     }
 
     private ArticleVo copy(Article article, boolean isTag, boolean isAuthor) {
@@ -139,10 +204,12 @@ public class ArticleServiceImpl implements ArticleService {
         }
         return articleVo;
     }
+
     @Autowired
     private CategoryService categoryService;
+
     //这里使用了重载，参数不相同
-    private ArticleVo copy(Article article, boolean isTag, boolean isAuthor,boolean idBody,boolean isCategory) {
+    private ArticleVo copy(Article article, boolean isTag, boolean isAuthor, boolean idBody, boolean isCategory) {
 
         ArticleVo articleVo = new ArticleVo();
         BeanUtils.copyProperties(article, articleVo);
@@ -156,24 +223,26 @@ public class ArticleServiceImpl implements ArticleService {
             Long authorId = article.getAuthorId();
             articleVo.setAuthor(sysUserService.findUserById(authorId).getNickname());
         }
-        if (idBody){
+        if (idBody) {
             Long bodyId = article.getBodyId();
             articleVo.setBody(findArticleBodyById(bodyId));
         }
-        if (isCategory){
+        if (isCategory) {
             Long categoryId = article.getCategoryId();
             articleVo.setCategory(categoryService.findCategoryById(categoryId));
         }
         return articleVo;
     }
-@Autowired
-private ArticleBodyMapper articleBodyMapper;
+
+    @Autowired
+    private ArticleBodyMapper articleBodyMapper;
+
     private ArticleBodyVo findArticleBodyById(Long bodyId) {
         ArticleBody articleBody = articleBodyMapper.selectById(bodyId);
-       ArticleBodyVo articleBodyVo=new ArticleBodyVo();
-       articleBodyVo.setContent(articleBody.getContent());
+        ArticleBodyVo articleBodyVo = new ArticleBodyVo();
+        articleBodyVo.setContent(articleBody.getContent());
 
-       return articleBodyVo;
+        return articleBodyVo;
     }
 }
 
