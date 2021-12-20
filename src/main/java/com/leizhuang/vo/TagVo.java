@@ -10,5 +10,5 @@ import lombok.Data;
 public class TagVo {
     private Long id;
     private String tagName;
-
+private String avatar;
 }

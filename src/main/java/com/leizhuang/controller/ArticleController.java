@@ -1,6 +1,7 @@
 package com.leizhuang.controller;
 
 import com.leizhuang.aop.LogAnnotation;
+import com.leizhuang.cache.Cache;
 import com.leizhuang.service.ArticleService;
 
 import com.leizhuang.vo.Result;
@@ -27,18 +28,21 @@ public class ArticleController {
      */
     @PostMapping
     @LogAnnotation(module = "文章",operator = "获取文章列表")
+    @Cache(expire = 5*60*1000,name="listArticle_article")
     public Result listArticle(@RequestBody PageParams pageParams) {
 
         return articleService.listArticle(pageParams);
     }
 
     @PostMapping("hot")
+    @Cache(expire = 5*60*1000,name="hot_article")
     public Result hotArticle() {
         int limit = 5;
         return articleService.hotArticle(limit);
     }
 
     @PostMapping("new")
+    @Cache(expire = 5*60*1000,name="news_article")
     public Result newArticle() {
         int limit = 5;
         return articleService.newArticle(limit);
@@ -50,7 +54,7 @@ public class ArticleController {
         return articleService.listArchives();
     }
 
-    @PostMapping("/view/{id}")
+    @PostMapping("view/{id}")
     public Result findArticleById(@PathVariable("id") Long articleId) {
         return articleService.findArticleById(articleId);
     }

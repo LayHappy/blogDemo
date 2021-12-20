@@ -62,8 +62,25 @@ public List<TagVo> copyList(List<Tag> tagList){
 
     @Override
     public Result findAll() {
-        List<Tag> tagList = this.tagMapper.selectList(new LambdaQueryWrapper<>());
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Tag::getId,Tag::getTagName);
+        List<Tag> tagList = this.tagMapper.selectList(queryWrapper);
         return Result.success(copyList(tagList));
+    }
+
+    @Override
+    public Result findAllDetail() {
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
+        List<Tag> tagList = this.tagMapper.selectList(queryWrapper);
+
+        return Result.success(copyList(tagList));
+    }
+
+    @Override
+    public Result findDetailById(Long id) {
+        Tag tag = tagMapper.selectById(id);
+
+        return Result.success(copy(tag));
     }
 }
 

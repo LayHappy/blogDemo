@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.leizhuang.dao.mapper.ArticleMapper">
-<!--    List<Archives> listArchives();-->
+    <!--    List<Archives> listArchives();-->
 
     <!--select
     year(create_date) as year,
@@ -11,11 +11,56 @@
     count(*) as count
     from ms_article
     group by year,month--><!--此条sql会导致查询出来的数据为null年null月，因为数据库字段类型为bigint 13位，直接year不行，需要先date转型然后year-->
+    <resultMap id="articleMap" type="com.leizhuang.dao.pojo.Article">
+        <id column="id" property="id"/>
+        <result column="author_id" property="authorId"/>
+        <result column="comment_counts" property="commentCounts"/>
+        <result column="create_date" property="createDate"/>
+        <result column="summary" property="summary"/>
+        <result column="title" property="title"/>
+        <result column="viewCounts" property="viewCounts"/>
+        <result column="weight" property="weight"/>
+        <result column="body_id" property="bodyId"/>
+        <result column="category_id" property="categoryId"/>
+    </resultMap>
+<!--
+在没写SQL3的时候SQL1可以正常使用，在写了SQL3之后，SQL1无效且SQL3无效，把SQL1改为SQL2之后SQL2，SQL3都能用了这是为什么，重点好像是在于'%Y'和'%m'
+-->
+    <!-- SQL1
+     select FROM_UNIXTIME(create_date / 1000) year,
+    FROM_UNIXTIME(create_date / 1000) month,
+    count(*)    count
+    from ms_article
+    group by year, month
+    -->
+    <!--SQL2-->
     <select id="listArchives" resultType="com.leizhuang.dao.dos.Archives">
-        select year(FROM_UNIXTIME(create_date / 1000))  year,
-               month(FROM_UNIXTIME(create_date / 1000)) month,
-               count(*)                                 count
-        from ms_article
-        group by year, month
+    select FROM_UNIXTIME(create_date / 1000,'%Y') year,
+           FROM_UNIXTIME(create_date / 1000,'%m') month,
+           count(*)                          count
+    from ms_article
+    group by year, month
+    </select>
+    <!--                   Long categoryId,
+                           Long tagId,
+                           String year,
+                           String month-->
+    <!--SQL3-->
+    <select id="listArticle" resultMap="articleMap">
+        select * from ms_article
+        <where>
+                 1=1
+            <if test="categoryId != null">
+                and (category_Id=#{categoryId})
+            </if>
+            <if test="tagId != null">
+                and id in(select article_id from ms_article_tag where tag_id=#{tagId})
+            </if>
+            <if test="year != null and year.length>0 and month != null and month.length>0">
+                and(FROM_UNIXTIME(create_date/1000,'%Y')=#{year} and FROM_UNIXTIME(create_date/1000,'%m')=#{month})
+
+            </if>
+        </where>
+        order by weight,create_date desc
     </select>
 </mapper>

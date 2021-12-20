@@ -1,6 +1,7 @@
 package com.leizhuang.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leizhuang.dao.dos.Archives;
 import com.leizhuang.dao.mapper.ArticleBodyMapper;
@@ -47,6 +48,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private ArticleTagMapper articleTagMapper;
+
     @Override
     public Result hotArticle(int limit) {
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
@@ -77,20 +79,48 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public Result listArticle(PageParams pageParams) {
-        /**
+         Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
+         IPage<Article> articleIPage = articleMapper.listArticle(page,
+                 pageParams.getCategoryId(),
+                 pageParams.getTagId(),
+                 pageParams.getYear(),
+                 pageParams.getMonth());
+         List<Article> records = articleIPage.getRecords();
+         return Result.success(copyList(records,true,true));
+     }
+  /*  @Override
+    public Result listArticle(PageParams pageParams) {
+        *//**
          * 分页查询article数据库表
-         */
+         *//*
         Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
         LambdaQueryWrapper<Article> queryWrapper = new LambdaQueryWrapper<>();
         //是否置顶进行排序
-
+        if (pageParams.getCategoryId() != null) {
+//    and category_id =#{categoryId}
+            queryWrapper.eq(Article::getCategoryId, pageParams.getCategoryId());
+        }
+        List<Long> articleIdList=new ArrayList<>();
+        if (pageParams.getTagId() != null) {
+//    加入标签的条件查询，Article一篇文章有多个标签
+            LambdaQueryWrapper<ArticleTag> articleTagLambdaQueryWrapper=new LambdaQueryWrapper<>();
+            articleTagLambdaQueryWrapper.eq(ArticleTag::getTagId,pageParams.getTagId());
+            List<ArticleTag> articleTags = articleTagMapper.selectList(articleTagLambdaQueryWrapper);
+            for (ArticleTag articleTag : articleTags) {
+                articleIdList.add(articleTag.getArticleId());
+            }
+            if (articleIdList.size()>0){
+                //and id in (1,2,3,54,5);
+                queryWrapper.in(Article::getId,articleIdList);
+            }
+        }
         // order by create_data desc
         queryWrapper.orderByDesc(Article::getWeight, Article::getCreateDate);
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
         List<Article> records = articlePage.getRecords();
         List<ArticleVo> articleVoList = copyList(records, true, true);
         return Result.success(articleVoList);
-    }
+    }*/
 
     private List<ArticleVo> copyList(List<Article> records, boolean isTag, boolean isAuthor) {
         List<ArticleVo> articleVoList = new ArrayList<>();
@@ -181,8 +211,8 @@ public class ArticleServiceImpl implements ArticleService {
 
         articleMapper.updateById(article);
 
-        Map<String,String> map=new HashMap<>();
-        map.put("id",article.getId().toString());
+        Map<String, String> map = new HashMap<>();
+        map.put("id", article.getId().toString());
 
         return Result.success(map);
     }

@@ -21,6 +21,34 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Override
+    public Result findAllDetail() {
+LambdaQueryWrapper<Category> queryWrapper=new LambdaQueryWrapper<>();
+queryWrapper.select(Category::getId,Category::getAvatar,Category::getCategoryName);
+/*
+==>  Preparing: SELECT id,avatar,category_name FROM ms_category
+==> Parameters:
+<==    Columns: id, avatar, category_name
+<==        Row: 1, /static/category/front.png, 前端
+<==        Row: 2, /static/category/back.png, 后端
+<==        Row: 3, /static/category/lift.jpg, 生活
+<==        Row: 4, /static/category/database.png, 数据库
+<==        Row: 5, /static/category/language.png, 编程语言
+<==      Total: 5                                           减少查询压力
+*/
+      List<Category> categories = categoryMapper.selectList(queryWrapper);
+
+        return Result.success(copyList(categories));
+    }
+
+    @Override
+    public Result categorysDetailById(Long id) {
+        Category category=categoryMapper.selectById(id);
+
+        return Result.success(copy(category));
+    }
+
     @Override
     public CategoryVo findCategoryById(Long categoryId) {
         Category category = categoryMapper.selectById(categoryId);
@@ -31,7 +59,10 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Result findAll() {
-        List<Category> categories = categoryMapper.selectList(new LambdaQueryWrapper<>());
+        LambdaQueryWrapper<Category> queryWrapper=new LambdaQueryWrapper<>();
+        queryWrapper.select(Category::getId,Category::getCategoryName);
+        List<Category> categories = categoryMapper.selectList(queryWrapper);
+//        List<Category> categories = categoryMapper.selectList(new LambdaQueryWrapper<>());
 
 //        页面交互的对象
 
